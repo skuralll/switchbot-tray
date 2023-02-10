@@ -97,7 +97,7 @@ export const Header = () => {
 			<MainAppBar>
 				<MainToolbar>
 					<Box sx={{ m: 0, flexGrow: 1 }} />
-					<TitleTypography variant="h6">SbotTray</TitleTypography>
+					<TitleTypography variant="h6">SwitchBot-Tray</TitleTypography>
 					<MainMenu />
 				</MainToolbar>
 			</MainAppBar>

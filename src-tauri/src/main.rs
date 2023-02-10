@@ -4,7 +4,7 @@
 )]
 
 // imports
-use tauri::{Manager, SystemTray, SystemTrayEvent, SystemTrayMenu};
+use tauri::{Manager, SystemTray, SystemTrayEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 
@@ -14,11 +14,14 @@ fn main() {
     // Build
     tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .system_tray(tray)
         // 各種設定
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             set_shadow(&window, true).unwrap(); // round up corner
+            window.hide().unwrap(); // hide window
+            window.set_always_on_top(true).unwrap(); // always on top
             Ok(())
         })
         // システムトレイの各イベントハンドラ
@@ -43,6 +46,7 @@ fn main() {
                 _ => {}
             }
         })
+        // .invoke_handler(tauri::generate_handler![get_token, get_secret,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
