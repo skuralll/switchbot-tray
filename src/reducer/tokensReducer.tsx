@@ -23,7 +23,6 @@ export const tokensReducer = (
 		case 'SET_TOKENS':
 			setSavedTokens(action.tokens);
 			save();
-			console.log('set tokens');
 			return { tokens: action.tokens };
 	}
 };
