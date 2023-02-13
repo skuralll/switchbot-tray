@@ -9,7 +9,7 @@ use chrono::Utc;
 use chrono::Utc;
 use ring::hmac;
 use serde::{Deserialize, Serialize};
-use serde_json::{Result as SerdeResult, Value};
+use serde_json::{json, Result as SerdeResult, Value};
 use tauri::{Manager, SystemTray, SystemTrayEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
@@ -125,12 +125,19 @@ async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::e
     }
 }
 
-//
+// デバイスリストを取得する
 #[tauri::command]
 async fn get_devices(tokens: Tokens) -> Result<Value, String> {
-    println!("{}\n{}", &tokens.token, &tokens.secret);
     let res = match get_request(&tokens, "https://api.switch-bot.com/v1.1/devices").await {
-        Ok(result) => return Ok(result),
+        Ok(result) => {
+            let mut devices: Vec<Value> = Vec::new();
+            ["deviceList", "infraredRemoteList"].iter().for_each(|x| {
+                result[x].as_array().unwrap().iter().for_each(|x| {
+                    devices.push(x.clone());
+                });
+            });
+            return Ok(json!(devices));
+        }
         Err(msg) => return Err(msg.to_string()),
     };
 }

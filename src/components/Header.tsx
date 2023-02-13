@@ -13,6 +13,7 @@ import {
 import { red } from '@mui/material/colors';
 import { styled } from '@mui/system';
 import MenuIcon from '@mui/icons-material/Menu';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import { EditTokenDialog } from './EditTokenDialog';
 
@@ -34,6 +35,12 @@ const TitleTypography = styled(Typography)(({ theme }) => ({
 }));
 
 const MenuIconButton = styled(IconButton)(({ theme }) => ({
+	size: 'small',
+	edge: 'end',
+	color: 'inherit',
+}));
+
+const RefreshButton = styled(IconButton)(({ theme }) => ({
 	size: 'small',
 	edge: 'end',
 	color: 'inherit',
@@ -90,14 +97,34 @@ const MainMenu = () => {
 	);
 };
 
+const Title = () => {
+	return (
+		<TitleTypography variant="h6" textAlign="center">
+			SwitchBot-Tray
+		</TitleTypography>
+	);
+};
+
+const DeviceRefreshButton = () => {
+	return (
+		<RefreshButton
+			onClick={() => {
+				// todo
+			}}
+		>
+			<RefreshIcon />
+		</RefreshButton>
+	);
+};
+
 // ヘッダー
 export const Header = ({ height }: { height: string }) => {
 	return (
-		<Box sx={{ flexGrow: 1, mb: { height } }}>
+		<Box sx={{ mb: { height } }}>
 			<MainAppBar>
 				<MainToolbar>
-					<Box sx={{ m: 0, flexGrow: 1 }} />
-					<TitleTypography variant="h6">SwitchBot-Tray</TitleTypography>
+					<DeviceRefreshButton />
+					<Title />
 					<MainMenu />
 				</MainToolbar>
 			</MainAppBar>

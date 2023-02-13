@@ -10,8 +10,8 @@ export const Home = () => {
 		<>
 			<TokensProvider>
 				<Header height="48px" />
-				<DeviceList height="592px" />
 				{/* <TestComponent /> */}
+				<DeviceList height="592px" />
 			</TokensProvider>
 		</>
 	);

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { invoke } from '@tauri-apps/api';
 import { useTokens } from '../contexts/tokensContext';
 import { sbot_test } from '../lib/switchbot';
+import { TDevice } from '../model';
 
 export const TestComponent = () => {
 	// アプリケーション全体でのトークン用State
@@ -16,10 +17,10 @@ export const TestComponent = () => {
 				variant="contained"
 				onClick={async () => {
 					try {
-						const res = await invoke<string>('get_devices', {
+						const res = await invoke<TDevice[]>('get_devices', {
 							tokens: tokens.tokens,
 						});
-						setText(JSON.stringify(res));
+						setText('result: ' + JSON.stringify(res));
 					} catch (e) {
 						setText(`${e}`);
 					}
