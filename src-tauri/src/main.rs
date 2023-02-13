@@ -2,15 +2,15 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
+use base64::encode;
+use chrono::Utc;
 #[cfg(target_os = "macos")]
-
 // imports
 use chrono::Utc;
-use ring::{hmac};
-use base64::{encode};
-use serde::{ Serialize, Deserialize };
+use ring::hmac;
+use serde::{Deserialize, Serialize};
 use serde_json::{Result as SerdeResult, Value};
-use tauri::{Manager, SystemTray, SystemTrayEvent,ActivationPolicy};
+use tauri::{Manager, SystemTray, SystemTrayEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 
@@ -28,9 +28,9 @@ fn main() {
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             window.hide().unwrap(); // hide window
-            app.set_activation_policy(ActivationPolicy::Accessory); // hide in dock
-			#[cfg(any(windows, target_os = "macos"))]
-			set_shadow(&window, true).unwrap();
+                                    //app.set_activation_policy(ActivationPolicy::Accessory); // hide in dock
+            #[cfg(any(windows, target_os = "macos"))]
+            set_shadow(&window, true).unwrap();
             //dev
             window.set_always_on_top(true).unwrap(); // always on top
             Ok(())
@@ -46,7 +46,7 @@ fn main() {
                 } => {
                     // クリック時にウィンドウの表示切替
                     let window = app.get_window("main").unwrap();
-                    let _ = window.move_window(Position::RightCenter);
+                    let _ = window.move_window(Position::TrayCenter);
                     if window.is_visible().unwrap() {
                         window.hide().unwrap();
                     } else {
@@ -66,12 +66,12 @@ fn main() {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Tokens {
-	token: String,
-	secret: String,
+    token: String,
+    secret: String,
 }
 
 // SwitchBotAPIにGETリクエストを送信する
-async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::error::Error>>{
+async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::error::Error>> {
     //タイムタンプ取得
     let t = (Utc::now().timestamp_millis() as i64).to_string();
     // ランダムな文字列
@@ -83,7 +83,8 @@ async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::e
     let sign = encode(signature.as_ref());
     //リクエスト作成->送信->レスポンス取得
     let client = reqwest::Client::new();
-    let body = client.get(url)
+    let body = client
+        .get(url)
         .header("Authorization", &tokens.token)
         .header("t", t)
         .header("sign", sign)
@@ -97,24 +98,37 @@ async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::e
     let res: Value = serde_json::from_str(&body)?;
     //ステータスコードを確認する
     let Some(obj) = res.as_object() else {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "request error")))};
-    match obj.get("statusCode"){
-        Some(status) => {
-            match status.as_i64(){
-                Some(100) => {
-                    return Ok(obj["body"].clone());
-                },
-                Some(190) => return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "device internal error"))),
-                _ => return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "unknown statusCode"))),
+    match obj.get("statusCode") {
+        Some(status) => match status.as_i64() {
+            Some(100) => {
+                return Ok(obj["body"].clone());
+            }
+            Some(190) => {
+                return Err(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "device internal error",
+                )))
+            }
+            _ => {
+                return Err(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "unknown statusCode",
+                )))
             }
         },
-        None => return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "invalid token"))),
+        None => {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "invalid token",
+            )))
+        }
     }
 }
 
-// 
+//
 #[tauri::command]
-async fn get_devices (tokens: Tokens) -> Result<Value, String>{
-	println!("{}\n{}", &tokens.token, &tokens.secret);
+async fn get_devices(tokens: Tokens) -> Result<Value, String> {
+    println!("{}\n{}", &tokens.token, &tokens.secret);
     let res = match get_request(&tokens, "https://api.switch-bot.com/v1.1/devices").await {
         Ok(result) => return Ok(result),
         Err(msg) => return Err(msg.to_string()),

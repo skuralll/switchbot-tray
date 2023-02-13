@@ -17,4 +17,17 @@ export const theme = createTheme({
 		body1: { fontSize: 16 },
 		button: { textTransform: 'none' },
 	},
+	components: {
+		MuiCssBaseline: {
+			styleOverrides: `
+	        ::-webkit-scrollbar{
+	            width: 8px;
+	        },
+	        ::-webkit-scrollbar-thumb {
+	            background-color: #cdcdcd;
+	            border-radius: 10px;
+	        }
+	        `,
+		},
+	},
 });

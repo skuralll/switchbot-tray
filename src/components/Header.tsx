@@ -91,9 +91,9 @@ const MainMenu = () => {
 };
 
 // ヘッダー
-export const Header = () => {
+export const Header = ({ height }: { height: string }) => {
 	return (
-		<Box sx={{ flexGrow: 1, mb: '48px' }}>
+		<Box sx={{ flexGrow: 1, mb: { height } }}>
 			<MainAppBar>
 				<MainToolbar>
 					<Box sx={{ m: 0, flexGrow: 1 }} />

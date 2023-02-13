@@ -9,8 +9,8 @@ export const Home = () => {
 	return (
 		<>
 			<TokensProvider>
-				<Header />
-				<DeviceList />
+				<Header height="48px" />
+				<DeviceList height="592px" />
 				{/* <TestComponent /> */}
 			</TokensProvider>
 		</>
