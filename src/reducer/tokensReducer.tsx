@@ -1,5 +1,5 @@
 import { getSavedTokens, save, setSavedTokens } from '../lib/storage';
-import { Tokens } from '../types';
+import { Tokens } from '../model';
 
 // 各Action
 export type TokensAction = { type: 'SET_TOKENS'; tokens: Tokens };

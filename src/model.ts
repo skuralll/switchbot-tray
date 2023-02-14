@@ -1,3 +1,9 @@
+// tokens model
+export type Tokens = {
+	token: string;
+	secret: string;
+};
+
 // base device type
 export type TDevice = {
 	deviceId: string | null;

@@ -13,7 +13,7 @@ import {
 	tokensReducer,
 	TokensState,
 } from '../reducer/tokensReducer';
-import { Tokens } from '../types';
+import { Tokens } from '../model';
 
 type TokensContextProps = {
 	state: TokensState;

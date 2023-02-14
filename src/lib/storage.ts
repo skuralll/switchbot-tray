@@ -1,5 +1,5 @@
 import { Store } from 'tauri-plugin-store-api';
-import { Tokens } from '../types';
+import { Tokens } from '../model';
 
 const store = new Store('.settings.dat');
 store.load();
