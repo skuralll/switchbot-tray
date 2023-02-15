@@ -3,14 +3,17 @@ import { Box, Button, Paper, Typography } from '@mui/material';
 import { TokensProvider } from '../contexts/tokensContext';
 import { TestComponent } from './TestComponent';
 import { DeviceList } from './DeviceList';
+import { DevicesProvider } from '../contexts/devicesContext';
 
 export const Home = () => {
 	return (
 		<>
 			<TokensProvider>
-				<Header height="48px" />
-				{/* <TestComponent /> */}
-				<DeviceList height="592px" />
+				<DevicesProvider>
+					<Header height="36px" />
+					{/* <TestComponent /> */}
+					<DeviceList height="604px" />
+				</DevicesProvider>
 			</TokensProvider>
 		</>
 	);

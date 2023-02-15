@@ -7,7 +7,7 @@ import { getDevices } from '../lib/switchbot';
 
 export const TestComponent = () => {
 	// アプリケーション全体でのトークン用State
-	const { state: tokens, dispatch } = useTokens();
+	const { state: tokens, dispatch: dispatch } = useTokens();
 	const [text, setText] = useState('Message');
 
 	return (

@@ -43,7 +43,10 @@ const MenuIconButton = styled(IconButton)(({ theme }) => ({
 const RefreshButton = styled(IconButton)(({ theme }) => ({
 	size: 'small',
 	edge: 'end',
-	color: 'inherit',
+	'&.Mui-disabled': {
+		background: 'transparent',
+		color: 'transparent',
+	},
 }));
 
 // メニューボタン＆メインメニュー
@@ -108,6 +111,7 @@ const Title = () => {
 const DeviceRefreshButton = () => {
 	return (
 		<RefreshButton
+			disabled
 			onClick={() => {
 				// todo
 			}}

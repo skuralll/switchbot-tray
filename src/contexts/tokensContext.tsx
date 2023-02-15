@@ -32,7 +32,7 @@ export const TokensProvider: React.FC<{ children: React.ReactNode }> = ({
 	// ユーザ情報の初期値
 	const [state, dispatch] = useReducer(tokensReducer, initialState);
 	return (
-		<TokensContext.Provider value={{ state, dispatch }}>
+		<TokensContext.Provider value={{ state, dispatch: dispatch }}>
 			{children}
 		</TokensContext.Provider>
 	);

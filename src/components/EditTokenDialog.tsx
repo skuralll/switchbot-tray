@@ -19,7 +19,7 @@ export const EditTokenDialog = (props: {
 	onClose: () => void;
 }) => {
 	// アプリケーション全体でのトークン用State
-	const { state: tokens, dispatch } = useTokens();
+	const { state: tokens, dispatch: dispatch } = useTokens();
 	// このコンポーネント内でのトークン用State
 	const [e_tokens, setEditTokens] = useState<Tokens>(tokens);
 	// 外部でトークンが変更されたら、このコンポーネント内のトークンも変更する

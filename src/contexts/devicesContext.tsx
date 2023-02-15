@@ -23,7 +23,7 @@ export const DevicesProvider: React.FC<{ children: React.ReactNode }> = ({
 	// ユーザ情報の初期値
 	const [state, dispatch] = useReducer(devicesReducer, initialState);
 	return (
-		<DevicesContext.Provider value={{ state, dispatch }}>
+		<DevicesContext.Provider value={{ state, dispatch: dispatch }}>
 			{children}
 		</DevicesContext.Provider>
 	);

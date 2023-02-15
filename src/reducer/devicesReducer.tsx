@@ -1,3 +1,4 @@
+import { getDevices } from '../lib/switchbot';
 import { TDevice } from '../model';
 
 // 各Aアクション
