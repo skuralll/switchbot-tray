@@ -12,8 +12,8 @@ import {
 import { useEffect } from 'react';
 import { useDevices } from '../contexts/devicesContext';
 import { useTokens } from '../contexts/tokensContext';
-import { getDevices } from '../lib/switchbot';
-import { TDevice } from '../model';
+import { getDevices, sendCommand } from '../lib/switchbot';
+import { Command, TDevice } from '../model';
 
 export const DeviceList = ({ height }: { height: string }) => {
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
@@ -55,6 +55,8 @@ export const DeviceList = ({ height }: { height: string }) => {
 };
 
 export const Device = ({ device }: { device: TDevice }) => {
+	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
+
 	return (
 		<Grid item xs={6}>
 			<Card>
@@ -69,16 +71,23 @@ export const Device = ({ device }: { device: TDevice }) => {
 					<Typography variant="h5" component="div">
 						{device.deviceName}
 					</Typography>
-					<Typography sx={{ mb: 1.5 }} color="text.secondary">
+					{/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
 						{device.deviceId}
-					</Typography>
+					</Typography> */}
 				</CardContent>
 				<CardActions sx={{ justifyContent: 'center' }}>
 					<Button
 						size="small"
 						variant="outlined"
 						color="error"
-						onClick={() => {}}
+						onClick={async () => {
+							const command: Command = {
+								deviceId: device.deviceId,
+								command: 'turnOn',
+								parameter: 'default',
+							};
+							const res = await sendCommand(tokens.tokens, command);
+						}}
 					>
 						ON
 					</Button>
@@ -86,7 +95,14 @@ export const Device = ({ device }: { device: TDevice }) => {
 						size="small"
 						variant="outlined"
 						color="primary"
-						onClick={() => {}}
+						onClick={async () => {
+							const command: Command = {
+								deviceId: device.deviceId,
+								command: 'turnOff',
+								parameter: 'default',
+							};
+							const res = await sendCommand(tokens.tokens, command);
+						}}
 					>
 						OFF
 					</Button>

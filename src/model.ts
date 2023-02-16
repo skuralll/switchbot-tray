@@ -6,7 +6,7 @@ export type Tokens = {
 
 // base device model
 export type TDevice = {
-	deviceId: string | null;
+	deviceId: string;
 	deviceName: string | null;
 	deviceType: string | null;
 	enableCloudService: boolean | null;
