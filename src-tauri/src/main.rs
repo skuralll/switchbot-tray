@@ -7,6 +7,7 @@ use chrono::Utc;
 #[cfg(target_os = "macos")]
 // imports
 use chrono::Utc;
+use reqwest::RequestBuilder;
 use ring::hmac;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Result as SerdeResult, Value};
@@ -57,7 +58,7 @@ fn main() {
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![get_devices,])
+        .invoke_handler(tauri::generate_handler![get_devices, send_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -70,8 +71,20 @@ struct Tokens {
     secret: String,
 }
 
-// SwitchBotAPIにGETリクエストを送信する
-async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::error::Error>> {
+#[derive(Debug, Serialize, Deserialize)]
+struct Command {
+    deviceId: String,
+    command: String,
+    parameter: String,
+}
+
+enum RequestType {
+    Get,
+    Post,
+}
+
+// HTTPリクエストのベースを作成する
+fn get_client(tokens: &Tokens, url: &str, req_type: RequestType) -> RequestBuilder {
     //タイムタンプ取得
     let t = (Utc::now().timestamp_millis() as i64).to_string();
     // ランダムな文字列
@@ -81,15 +94,22 @@ async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::e
     let key = hmac::Key::new(hmac::HMAC_SHA256, &tokens.secret.as_bytes());
     let signature = hmac::sign(&key, str_to_sign.as_bytes());
     let sign = encode(signature.as_ref());
-    //リクエスト作成->送信->レスポンス取得
-    let client = reqwest::Client::new();
-    let body = client
-        .get(url)
+    //リクエスト作成
+    let request = match req_type {
+        RequestType::Get => reqwest::Client::new().get(url),
+        RequestType::Post => reqwest::Client::new().post(url),
+    };
+    request
         .header("Authorization", &tokens.token)
         .header("t", t)
         .header("sign", sign)
         .header("nonce", nonce)
         .header("Content-Type", "application/json")
+}
+
+// SwitchBotAPIにGETリクエストを送信する
+async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::error::Error>> {
+    let body = get_client(tokens, url, RequestType::Get)
         .send()
         .await?
         .text()
@@ -125,6 +145,48 @@ async fn get_request(tokens: &Tokens, url: &str) -> Result<Value, Box<dyn std::e
     }
 }
 
+// SwitchBotAPIにPOSTリクエストを送信する
+async fn post_request(
+    tokens: &Tokens,
+    url: &str,
+    req_json: &Value,
+) -> Result<Value, Box<dyn std::error::Error>> {
+    let body = get_client(tokens, url, RequestType::Post)
+        .body(req_json.to_string())
+        .send()
+        .await?
+        .text()
+        .await?;
+    // レスポンスをデコードする
+    let res: Value = serde_json::from_str(&body)?;
+    //ステータスコードを確認して成功していた場合結果を返す
+    let Some(obj) = res.as_object() else {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "request error")))};
+    match obj.get("statusCode") {
+        Some(status) => match status.as_i64() {
+            Some(100) => {
+                return Ok(obj["message"].clone());
+            }
+            _ => {}
+        },
+        None => {}
+    }
+    // エラー処理
+    match obj.get("message") {
+        Some(msg) => {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                msg.to_string(),
+            )));
+        }
+        None => {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "unknown error",
+            )));
+        }
+    }
+}
+
 // デバイスリストを取得する
 #[tauri::command]
 async fn get_devices(tokens: Tokens) -> Result<Value, String> {
@@ -137,6 +199,25 @@ async fn get_devices(tokens: Tokens) -> Result<Value, String> {
                 });
             });
             return Ok(json!(devices));
+        }
+        Err(msg) => return Err(msg.to_string()),
+    };
+}
+
+// デバイス操作コマンドを送信する
+#[tauri::command]
+async fn send_command(tokens: Tokens, command: Command) -> Result<String, String> {
+    let url = format!(
+        "https://api.switch-bot.com/v1.0/devices/{}/commands",
+        command.deviceId
+    );
+    let req_json = json!({
+        "command": command.command,
+        "parameter": command.parameter,
+    });
+    let res = match post_request(&tokens, &url, &req_json).await {
+        Ok(result) => {
+            return Ok(result.as_str().unwrap().to_string());
         }
         Err(msg) => return Err(msg.to_string()),
     };

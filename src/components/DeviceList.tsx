@@ -69,9 +69,9 @@ export const Device = ({ device }: { device: TDevice }) => {
 					<Typography variant="h5" component="div">
 						{device.deviceName}
 					</Typography>
-					{/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
+					<Typography sx={{ mb: 1.5 }} color="text.secondary">
 						{device.deviceId}
-					</Typography> */}
+					</Typography>
 				</CardContent>
 				<CardActions sx={{ justifyContent: 'center' }}>
 					<Button

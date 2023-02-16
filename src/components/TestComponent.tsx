@@ -2,8 +2,8 @@ import { Button, Typography } from '@mui/material';
 import { useState } from 'react';
 import { invoke } from '@tauri-apps/api';
 import { useTokens } from '../contexts/tokensContext';
-import { TDevice } from '../model';
-import { getDevices } from '../lib/switchbot';
+import { Command, TDevice } from '../model';
+import { getDevices, sendCommand } from '../lib/switchbot';
 
 export const TestComponent = () => {
 	// アプリケーション全体でのトークン用State
@@ -17,10 +17,15 @@ export const TestComponent = () => {
 				variant="contained"
 				onClick={async () => {
 					try {
-						const res = await getDevices(tokens.tokens);
-						setText('result: ' + JSON.stringify(res));
+						const command: Command = {
+							deviceId: '02-202301072345-96907646',
+							command: 'turnOn',
+							parameter: 'default',
+						};
+						const res = await sendCommand(tokens.tokens, command);
+						setText('Success: ' + JSON.stringify(res));
 					} catch (e) {
-						setText(`${e}`);
+						setText(`Error: ${e}`);
 					}
 				}}
 			>

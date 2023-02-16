@@ -4,7 +4,7 @@ export type Tokens = {
 	secret: string;
 };
 
-// base device type
+// base device model
 export type TDevice = {
 	deviceId: string | null;
 	deviceName: string | null;
@@ -12,4 +12,11 @@ export type TDevice = {
 	enableCloudService: boolean | null;
 	hubDeviceId: string | null;
 	remoteType: string | null;
+};
+
+// device control command model
+export type Command = {
+	deviceId: string;
+	command: string;
+	parameter: string;
 };
