@@ -1,4 +1,4 @@
-import { getSavedTokens, save, setSavedTokens } from '../lib/storage';
+import { getSavedTokens, save, setSavedTokens } from '../libs/storage';
 import { Tokens } from '../model';
 
 // 各Action

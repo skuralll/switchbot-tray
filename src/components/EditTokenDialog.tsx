@@ -11,7 +11,7 @@ import {
 import { dialog } from '@tauri-apps/api';
 import React, { useEffect, useState, useContext } from 'react';
 import { useTokens } from '../contexts/tokensContext';
-import { save, setSavedTokens } from '../lib/storage';
+import { save, setSavedTokens } from '../libs/storage';
 import { Tokens } from '../types';
 
 export const EditTokenDialog = (props: {

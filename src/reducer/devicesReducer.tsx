@@ -1,12 +1,12 @@
-import { getDevices } from '../lib/switchbot';
-import { TDevice } from '../model';
+import { getDevices } from '../libs/switchbot/api';
+import { SwitchBotDevice } from '../libs/switchbot/devices';
 
 // 各Aアクション
-export type DevicesAction = { type: 'SET_DEVICES'; devices: TDevice[] };
+export type DevicesAction = { type: 'SET_DEVICES'; devices: SwitchBotDevice[] };
 
 // デバイスリストの状態
 export type DevicesState = {
-	devices: TDevice[];
+	devices: SwitchBotDevice[];
 };
 
 // デバイスリストの初期状態

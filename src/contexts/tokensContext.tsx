@@ -6,7 +6,7 @@ import React, {
 	useReducer,
 	useState,
 } from 'react';
-import { getSavedTokens, setSavedTokens, STORAGE_KEY } from '../lib/storage';
+import { getSavedTokens, setSavedTokens, STORAGE_KEY } from '../libs/storage';
 import {
 	initialState,
 	TokensAction,

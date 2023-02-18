@@ -9,12 +9,15 @@ import {
 	Paper,
 	Typography,
 } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDevices } from '../contexts/devicesContext';
 import { useTokens } from '../contexts/tokensContext';
-import { getDevices, sendCommand } from '../lib/switchbot';
-import { Command, TDevice } from '../model';
+import { useSnackbar } from '../libs/snackbar/Snackbar';
+import { getDevices, sendCommand } from '../libs/switchbot/api';
+import { Command } from '../model';
+import { SwitchBotDevice } from '../libs/switchbot/devices';
 
+// デバイスリスト
 export const DeviceList = ({ height }: { height: string }) => {
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
 	const { state: devices, dispatch: dispatch_devices } = useDevices();
@@ -22,10 +25,9 @@ export const DeviceList = ({ height }: { height: string }) => {
 	// トークンが変更された場合デバイスリストを更新する
 	useEffect(() => {
 		(async () => {
-			let devices: TDevice[] = [];
+			let devices: SwitchBotDevice[] = [];
 			try {
 				devices = await getDevices(tokens.tokens);
-				console.log(devices.length);
 			} catch (err) {
 				//取得エラー時
 			} finally {
@@ -54,8 +56,15 @@ export const DeviceList = ({ height }: { height: string }) => {
 	);
 };
 
-export const Device = ({ device }: { device: TDevice }) => {
+// デバイス
+export const Device = ({ device }: { device: SwitchBotDevice }) => {
+	const { showSnackbar } = useSnackbar();
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
+	// todo
+	const [info, setInfo] = useState([]);
+	useEffect(() => {
+		(async () => {})();
+	}, []);
 
 	return (
 		<Grid item xs={6}>
@@ -71,9 +80,7 @@ export const Device = ({ device }: { device: TDevice }) => {
 					<Typography variant="h5" component="div">
 						{device.deviceName}
 					</Typography>
-					{/* <Typography sx={{ mb: 1.5 }} color="text.secondary">
-						{device.deviceId}
-					</Typography> */}
+					<DeviceInfo device={device} />
 				</CardContent>
 				<CardActions sx={{ justifyContent: 'center' }}>
 					<Button
@@ -86,7 +93,12 @@ export const Device = ({ device }: { device: TDevice }) => {
 								command: 'turnOn',
 								parameter: 'default',
 							};
-							const res = await sendCommand(tokens.tokens, command);
+							try {
+								const res = await sendCommand(tokens.tokens, command);
+								showSnackbar(`${res}`, 'success');
+							} catch (err) {
+								showSnackbar(`${err}`, 'error');
+							}
 						}}
 					>
 						ON
@@ -109,5 +121,23 @@ export const Device = ({ device }: { device: TDevice }) => {
 				</CardActions>
 			</Card>
 		</Grid>
+	);
+};
+
+// デバイス詳細情報
+const DeviceInfo = ({ device }: { device: SwitchBotDevice }) => {
+	//todo
+	let info = '';
+	switch (device.deviceType) {
+		default:
+			// info = device.deviceId;
+			break;
+	}
+	return (
+		<>
+			<Typography sx={{ m: 0 }} color="text.secondary">
+				{info}
+			</Typography>
+		</>
 	);
 };

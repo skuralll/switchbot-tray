@@ -4,16 +4,19 @@ import { Home } from './components/Home';
 import { theme } from './theme';
 import React, { useEffect, useState } from 'react';
 import { CssBaseline } from '@mui/material';
+import './App.css';
 
 export default function App() {
 	return (
-		<ThemeProvider theme={theme}>
-			<CssBaseline />
-			<Router>
-				<Routes>
-					<Route path="/" element={<Home />} />
-				</Routes>
-			</Router>
-		</ThemeProvider>
+		<div className="container">
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
+				<Router>
+					<Routes>
+						<Route path="/" element={<Home />} />
+					</Routes>
+				</Router>
+			</ThemeProvider>
+		</div>
 	);
 }

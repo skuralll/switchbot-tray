@@ -2,10 +2,9 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-use base64::encode;
-use chrono::Utc;
-#[cfg(target_os = "macos")]
+
 // imports
+use base64::encode;
 use chrono::Utc;
 use reqwest::RequestBuilder;
 use ring::hmac;
@@ -58,7 +57,11 @@ fn main() {
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![get_devices, send_command])
+        .invoke_handler(tauri::generate_handler![
+            get_devices,
+            send_command,
+            get_status
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -175,7 +178,7 @@ async fn post_request(
         Some(msg) => {
             return Err(Box::new(std::io::Error::new(
                 std::io::ErrorKind::Other,
-                msg.to_string(),
+                msg.as_str().unwrap(),
             )));
         }
         None => {
@@ -204,11 +207,26 @@ async fn get_devices(tokens: Tokens) -> Result<Value, String> {
     };
 }
 
+//デバイスステータスを取得する
+#[tauri::command]
+async fn get_status(tokens: Tokens, device_id: String) -> Result<Value, String> {
+    let url = format!(
+        "https://api.switch-bot.com/v1.1/devices/{}/status",
+        device_id
+    );
+    let res = match get_request(&tokens, &url).await {
+        Ok(result) => {
+            return Ok(result);
+        }
+        Err(msg) => return Err(msg.to_string()),
+    };
+}
+
 // デバイス操作コマンドを送信する
 #[tauri::command]
 async fn send_command(tokens: Tokens, command: Command) -> Result<String, String> {
     let url = format!(
-        "https://api.switch-bot.com/v1.0/devices/{}/commands",
+        "https://api.switch-bot.com/v1.1/devices/{}/commands",
         command.deviceId
     );
     let req_json = json!({
