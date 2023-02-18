@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { invoke } from '@tauri-apps/api';
 import { useTokens } from '../contexts/tokensContext';
 import { Command } from '../model';
-import { getDevices, sendCommand } from '../libs/switchbot/api';
+import { getDevices, sendCommand } from '../libs/switchbot/switchbot';
 import { useSnackbar } from '../libs/snackbar/Snackbar';
 import { SwitchBotDevice } from '../libs/switchbot/devices';
 

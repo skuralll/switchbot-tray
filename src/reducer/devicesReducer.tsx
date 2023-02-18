@@ -1,4 +1,4 @@
-import { getDevices } from '../libs/switchbot/api';
+import { getDevices } from '../libs/switchbot/switchbot';
 import { SwitchBotDevice } from '../libs/switchbot/devices';
 
 // 各Aアクション

@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { useDevices } from '../contexts/devicesContext';
 import { useTokens } from '../contexts/tokensContext';
 import { useSnackbar } from '../libs/snackbar/Snackbar';
-import { getDevices, sendCommand } from '../libs/switchbot/api';
+import { getDevices, sendCommand } from '../libs/switchbot/switchbot';
 import { Command } from '../model';
 import { SwitchBotDevice } from '../libs/switchbot/devices';
 

@@ -49,3 +49,9 @@ export const sendCommand = async (
 		throw e;
 	}
 };
+
+// デバイスの詳細情報を持ったオブジェクトを取得する
+export const getSpecializedDevice = (
+	token: Tokens,
+	device: SwitchBotDevice
+) => {};
