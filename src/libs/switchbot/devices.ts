@@ -6,4 +6,5 @@ export type SwitchBotDevice = {
 	enableCloudService: boolean | null;
 	hubDeviceId: string;
 	remoteType: string | null;
+	detail: { [key: string]: string | number | boolean } | null;
 };

@@ -1,9 +1,13 @@
-import { Button, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useState } from 'react';
 import { invoke } from '@tauri-apps/api';
 import { useTokens } from '../contexts/tokensContext';
 import { Command } from '../model';
-import { getDevices, sendCommand } from '../libs/switchbot/switchbot';
+import {
+	getDevices,
+	getStatus,
+	sendCommand,
+} from '../libs/switchbot/switchbot';
 import { useSnackbar } from '../libs/snackbar/Snackbar';
 import { SwitchBotDevice } from '../libs/switchbot/devices';
 
@@ -20,12 +24,8 @@ export const TestComponent = () => {
 				variant="contained"
 				onClick={async () => {
 					try {
-						const res: object = await invoke('get_status', {
-							tokens: tokens.tokens,
-							deviceId: 'D9636F139806',
-						});
-						const temp: number = res['temperature'];
-						setText(`${typeof temp} ${Object.prototype.toString.call(temp)}`);
+						const res = await getStatus(tokens.tokens, 'D9636F139806');
+						setText(JSON.stringify(res));
 					} catch (e) {
 						setText(`Error: ${e}`);
 					}

@@ -13,7 +13,11 @@ import { useEffect, useState } from 'react';
 import { useDevices } from '../contexts/devicesContext';
 import { useTokens } from '../contexts/tokensContext';
 import { useSnackbar } from '../libs/snackbar/Snackbar';
-import { getDevices, sendCommand } from '../libs/switchbot/switchbot';
+import {
+	getDevices,
+	getStatus,
+	sendCommand,
+} from '../libs/switchbot/switchbot';
 import { Command } from '../model';
 import { SwitchBotDevice } from '../libs/switchbot/devices';
 
@@ -48,7 +52,7 @@ export const DeviceList = ({ height }: { height: string }) => {
 			>
 				<Grid container spacing={2}>
 					{devices.devices.map((device) => (
-						<Device key={device.deviceId} device={device} />
+						<Device key={device.deviceId} device_raw={device} />
 					))}
 				</Grid>
 			</Box>
@@ -57,13 +61,23 @@ export const DeviceList = ({ height }: { height: string }) => {
 };
 
 // デバイス
-export const Device = ({ device }: { device: SwitchBotDevice }) => {
+export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 	const { showSnackbar } = useSnackbar();
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
-	// todo
-	const [info, setInfo] = useState([]);
+	// デバイス管理用State
+	const [device, setDevice] = useState(device_raw);
 	useEffect(() => {
-		(async () => {})();
+		(async () => {
+			// デバイスの詳細情報を取得する
+			try {
+				const res = await getStatus(tokens.tokens, device.deviceId);
+				device.detail = res;
+				setDevice(device);
+			} catch (err) {
+				//取得エラー時
+				// todo
+			}
+		})();
 	}, []);
 
 	return (
@@ -127,15 +141,29 @@ export const Device = ({ device }: { device: SwitchBotDevice }) => {
 // デバイス詳細情報
 const DeviceInfo = ({ device }: { device: SwitchBotDevice }) => {
 	//todo
-	let info = '';
-	switch (device.deviceType) {
-		default:
-			// info = device.deviceId;
-			break;
+	let info = '---';
+	if (device.detail !== null) {
+		// 各Botごとに詳細情報を作成する
+		switch (device.deviceType) {
+			case 'Bot':
+				info = `${device.detail.power}`.toUpperCase();
+				break;
+			case 'Plug Mini (US)':
+			case 'Plug Mini (JP)':
+				info = `${device.detail.voltage}V | ${device.detail.weight}W/d`;
+				break;
+			case 'Plug':
+				info = `${device.detail.power}`.toUpperCase();
+				break;
+			case 'Meter':
+				info = `${device.detail.temperature}℃ | ${device.detail.humidity}%`;
+				break;
+		}
 	}
+
 	return (
 		<>
-			<Typography sx={{ m: 0 }} color="text.secondary">
+			<Typography sx={{ m: 0, fontSize: '14px' }} color="text.secondary">
 				{info}
 			</Typography>
 		</>

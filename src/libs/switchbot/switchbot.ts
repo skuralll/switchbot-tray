@@ -15,19 +15,19 @@ export const getDevices = async (
 	}
 };
 
-// 詳細なデバイスリストを取得する
-//todo
-
 // デバイスのステータスを取得する
 export const getStatus = async (
 	tokens: Tokens,
 	device_id: string
-): Promise<SwitchBotDevice[]> => {
+): Promise<{ [key: string]: string | number | boolean }> => {
 	try {
-		return await invoke<SwitchBotDevice[]>('get_status', {
-			tokens: tokens,
-			deviceId: device_id,
-		});
+		return await invoke<{ [key: string]: string | number | boolean }>(
+			'get_status',
+			{
+				tokens: tokens,
+				deviceId: device_id,
+			}
+		);
 	} catch (e) {
 		throw e;
 	}
@@ -44,14 +44,6 @@ export const sendCommand = async (
 			command: command,
 		});
 	} catch (e) {
-		console.log('aaaa');
-		console.log(e);
 		throw e;
 	}
 };
-
-// デバイスの詳細情報を持ったオブジェクトを取得する
-export const getSpecializedDevice = (
-	token: Tokens,
-	device: SwitchBotDevice
-) => {};
