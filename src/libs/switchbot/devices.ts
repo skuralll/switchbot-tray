@@ -1,9 +1,9 @@
 // base device model
 export type SwitchBotDevice = {
 	deviceId: string;
-	deviceName: string | null;
+	deviceName: string;
 	deviceType: string | null;
 	enableCloudService: boolean | null;
-	hubDeviceId: string | null;
+	hubDeviceId: string;
 	remoteType: string | null;
 };
