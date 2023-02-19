@@ -10,7 +10,7 @@ use reqwest::RequestBuilder;
 use ring::hmac;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Result as SerdeResult, Value};
-use tauri::{Manager, SystemTray, SystemTrayEvent};
+use tauri::{ActivationPolicy, Manager, SystemTray, SystemTrayEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 
@@ -28,11 +28,10 @@ fn main() {
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             window.hide().unwrap(); // hide window
-                                    //app.set_activation_policy(ActivationPolicy::Accessory); // hide in dock
             #[cfg(any(windows, target_os = "macos"))]
+            app.set_activation_policy(ActivationPolicy::Accessory); // hide in dock
             set_shadow(&window, true).unwrap();
             //dev
-            window.set_always_on_top(true).unwrap(); // always on top
             Ok(())
         })
         // システムトレイの各イベントハンドラ

@@ -71,8 +71,9 @@ export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 			// デバイスの詳細情報を取得する
 			try {
 				const res = await getStatus(tokens.tokens, device.deviceId);
-				device.detail = res;
-				setDevice(device);
+				let new_device = JSON.parse(JSON.stringify(device)); // deep copy
+				new_device.detail = res;
+				setDevice(new_device);
 			} catch (err) {
 				//取得エラー時
 				// todo
@@ -142,7 +143,7 @@ export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 const DeviceInfo = ({ device }: { device: SwitchBotDevice }) => {
 	//todo
 	let info = '---';
-	if (device.detail !== null) {
+	if (device.detail != null) {
 		// 各Botごとに詳細情報を作成する
 		switch (device.deviceType) {
 			case 'Bot':
