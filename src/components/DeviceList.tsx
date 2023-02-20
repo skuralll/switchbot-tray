@@ -5,10 +5,12 @@ import {
 	CardActions,
 	CardContent,
 	css,
+	Fab,
 	Grid,
 	Paper,
 	Typography,
 } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { useEffect, useState } from 'react';
 import { useDevices } from '../contexts/devicesContext';
 import { useTokens } from '../contexts/tokensContext';
@@ -26,25 +28,39 @@ export const DeviceList = ({ height }: { height: string }) => {
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
 	const { state: devices, dispatch: dispatch_devices } = useDevices();
 
+	// デバイスリストを更新する
+	const updateDeviceList = async () => {
+		dispatch_devices({
+			type: 'SET_DEVICES',
+			devices: [],
+		});
+		let devices: SwitchBotDevice[] = [];
+		try {
+			devices = await getDevices(tokens.tokens);
+		} catch (err) {
+			//取得エラー時
+		} finally {
+			dispatch_devices({
+				type: 'SET_DEVICES',
+				devices: devices,
+			});
+		}
+	};
+
 	// トークンが変更された場合デバイスリストを更新する
 	useEffect(() => {
-		(async () => {
-			let devices: SwitchBotDevice[] = [];
-			try {
-				devices = await getDevices(tokens.tokens);
-			} catch (err) {
-				//取得エラー時
-			} finally {
-				dispatch_devices({
-					type: 'SET_DEVICES',
-					devices: devices,
-				});
-			}
-		})();
+		updateDeviceList();
 	}, [tokens]);
 
 	return (
 		<>
+			<Fab
+				color="primary"
+				sx={{ position: 'fixed', bottom: '20px', right: '20px' }}
+				onClick={updateDeviceList}
+			>
+				<RefreshIcon />
+			</Fab>
 			<Box
 				component="div"
 				height={height}
@@ -84,7 +100,7 @@ export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 	return (
 		<Grid item xs={6}>
 			<Card>
-				<CardContent sx={{ justifyContent: 'center' }}>
+				<CardContent sx={{ justifyContent: 'center', pb: 0 }}>
 					<Typography
 						sx={{ fontSize: '14px' }}
 						color="text.secondary"
@@ -98,41 +114,7 @@ export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 					<DeviceInfo device={device} />
 				</CardContent>
 				<CardActions sx={{ justifyContent: 'center' }}>
-					<Button
-						size="small"
-						variant="outlined"
-						color="error"
-						onClick={async () => {
-							const command: Command = {
-								deviceId: device.deviceId,
-								command: 'turnOn',
-								parameter: 'default',
-							};
-							try {
-								const res = await sendCommand(tokens.tokens, command);
-								showSnackbar(`${res}`, 'success');
-							} catch (err) {
-								showSnackbar(`${err}`, 'error');
-							}
-						}}
-					>
-						ON
-					</Button>
-					<Button
-						size="small"
-						variant="outlined"
-						color="primary"
-						onClick={async () => {
-							const command: Command = {
-								deviceId: device.deviceId,
-								command: 'turnOff',
-								parameter: 'default',
-							};
-							const res = await sendCommand(tokens.tokens, command);
-						}}
-					>
-						OFF
-					</Button>
+					<DeviceControl device={device} />
 				</CardActions>
 			</Card>
 		</Grid>
@@ -169,4 +151,73 @@ const DeviceInfo = ({ device }: { device: SwitchBotDevice }) => {
 			</Typography>
 		</>
 	);
+};
+
+// デバイス詳細情報
+const DeviceControl = ({ device }: { device: SwitchBotDevice }) => {
+	const { showSnackbar } = useSnackbar();
+	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
+
+	// 操作コマンドを送信し、結果をSnackBarに表示する
+	const controlDevice = async (command: Command) => {
+		try {
+			const res = await sendCommand(tokens.tokens, command);
+			showSnackbar(`${res}`, 'success');
+		} catch (err) {
+			showSnackbar(`${err}`, 'error');
+		}
+	};
+
+	const dummy = (
+		<Button size="small" disabled>
+			---
+		</Button>
+	);
+
+	if (device.detail == null) {
+		return dummy;
+	}
+
+	const d_type = device.deviceType ?? device.remoteType ?? 'unknown';
+	switch (d_type) {
+		case 'Plug Mini (US)':
+		case 'Plug Mini (JP)':
+		case 'Plug':
+		case 'Bot':
+			return (
+				<>
+					<Button
+						size="small"
+						variant="outlined"
+						color="error"
+						onClick={async () => {
+							controlDevice({
+								deviceId: device.deviceId,
+								command: 'turnOn',
+								parameter: 'default',
+							});
+						}}
+					>
+						ON
+					</Button>
+					<Button
+						size="small"
+						variant="outlined"
+						color="primary"
+						onClick={async () => {
+							controlDevice({
+								deviceId: device.deviceId,
+								command: 'turnOff',
+								parameter: 'default',
+							});
+						}}
+					>
+						OFF
+					</Button>
+				</>
+			);
+
+		default:
+			return dummy;
+	}
 };

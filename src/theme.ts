@@ -30,4 +30,9 @@ export const theme = createTheme({
 	        `,
 		},
 	},
+	palette: {
+		primary: {
+			main: '#e53935',
+		},
+	},
 });

@@ -26,7 +26,7 @@ const MainAppBar = styled(AppBar)(({ theme }) => ({
 // ToolBar
 const MainToolbar = styled(Toolbar)(({ theme }) => ({
 	minHeight: `36px`,
-	backgroundColor: red[600],
+	backgroundColor: 'primary',
 }));
 
 const TitleTypography = styled(Typography)(({ theme }) => ({
