@@ -80,22 +80,27 @@ export const DeviceList = ({ height }: { height: string }) => {
 export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 	const { showSnackbar } = useSnackbar();
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
+
 	// デバイス管理用State
 	const [device, setDevice] = useState(device_raw);
 	useEffect(() => {
 		(async () => {
-			// デバイスの詳細情報を取得する
-			try {
-				const res = await getStatus(tokens.tokens, device.deviceId);
-				let new_device = JSON.parse(JSON.stringify(device)); // deep copy
-				new_device.detail = res;
-				setDevice(new_device);
-			} catch (err) {
-				//取得エラー時
-				// todo
-			}
+			await updateDeviceInfo();
 		})();
 	}, []);
+
+	const updateDeviceInfo = async () => {
+		// デバイスの詳細情報を取得する
+		try {
+			const res = await getStatus(tokens.tokens, device.deviceId);
+			let new_device = JSON.parse(JSON.stringify(device)); // deep copy
+			new_device.detail = res;
+			setDevice(new_device);
+		} catch (err) {
+			//取得エラー時
+			// todo
+		}
+	};
 
 	return (
 		<Grid item xs={6}>
@@ -114,7 +119,7 @@ export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 					<DeviceInfo device={device} />
 				</CardContent>
 				<CardActions sx={{ justifyContent: 'center' }}>
-					<DeviceControl device={device} />
+					<DeviceControl device={device} updateDeviceInfo={updateDeviceInfo} />
 				</CardActions>
 			</Card>
 		</Grid>
@@ -154,7 +159,13 @@ const DeviceInfo = ({ device }: { device: SwitchBotDevice }) => {
 };
 
 // デバイス詳細情報
-const DeviceControl = ({ device }: { device: SwitchBotDevice }) => {
+const DeviceControl = ({
+	device,
+	updateDeviceInfo,
+}: {
+	device: SwitchBotDevice;
+	updateDeviceInfo: () => Promise<void>;
+}) => {
 	const { showSnackbar } = useSnackbar();
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
 
@@ -163,6 +174,9 @@ const DeviceControl = ({ device }: { device: SwitchBotDevice }) => {
 		try {
 			const res = await sendCommand(tokens.tokens, command);
 			showSnackbar(`${res}`, 'success');
+			// デバイス情報を更新する
+			await new Promise((s) => setTimeout(s, 2000)); // 反映に時間がかかるため1秒待つ
+			await updateDeviceInfo();
 		} catch (err) {
 			showSnackbar(`${err}`, 'error');
 		}
@@ -179,7 +193,6 @@ const DeviceControl = ({ device }: { device: SwitchBotDevice }) => {
 	// }
 
 	const d_type = device.deviceType ?? device.remoteType ?? 'unknown';
-	console.log(device.deviceName);
 	switch (d_type) {
 		case 'Hub':
 		case 'Hub Plus':
