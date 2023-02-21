@@ -1,3 +1,9 @@
+// Windowsでコマンドプロンプトが起動するのを阻止する
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
 // imports
 use base64::encode;
 use chrono::Utc;
