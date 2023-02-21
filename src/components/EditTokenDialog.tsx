@@ -15,7 +15,7 @@ import { dialog } from '@tauri-apps/api';
 import React, { useEffect, useState, useContext } from 'react';
 import { useTokens } from '../contexts/tokensContext';
 import { save, setSavedTokens } from '../libs/storage';
-import { Tokens } from '../types';
+import { Tokens } from '../model';
 
 export const EditTokenDialog = (props: {
 	open: boolean;
@@ -98,7 +98,8 @@ export const TokenField = ({
 	setEditTokens,
 }: {
 	label: string;
-	tokenKey: string;
+
+	tokenKey: keyof Tokens;
 	showPassword: boolean;
 	setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
 	editTokens: Tokens;
