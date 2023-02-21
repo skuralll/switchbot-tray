@@ -1,8 +1,3 @@
-#![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
-)]
-
 // imports
 use base64::encode;
 use chrono::Utc;
@@ -10,10 +5,13 @@ use reqwest::RequestBuilder;
 use ring::hmac;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Result as SerdeResult, Value};
-use tauri::{ActivationPolicy, Manager, SystemTray, SystemTrayEvent};
+use tauri::{Manager, SystemTray, SystemTrayEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 
+#[cfg(target_os = "macos")]
+use tauri::ActivationPolicy;
+// use
 // メインプロセス
 
 fn main() {
@@ -28,10 +26,11 @@ fn main() {
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             window.hide().unwrap(); // hide window
-            #[cfg(any(windows, target_os = "macos"))]
-            app.set_activation_policy(ActivationPolicy::Accessory); // hide in dock
             set_shadow(&window, true).unwrap();
-            //dev
+            #[cfg(target_os = "macos")]
+            {
+                app.set_activation_policy(ActivationPolicy::Accessory); // hide in dock
+            }
             Ok(())
         })
         // システムトレイの各イベントハンドラ
