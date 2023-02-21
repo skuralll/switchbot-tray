@@ -174,16 +174,26 @@ const DeviceControl = ({ device }: { device: SwitchBotDevice }) => {
 		</Button>
 	);
 
-	if (device.detail == null) {
-		return dummy;
-	}
+	// if (device.detail == null) {
+	// 	return dummy;
+	// }
 
 	const d_type = device.deviceType ?? device.remoteType ?? 'unknown';
+	console.log(device.deviceName);
 	switch (d_type) {
-		case 'Plug Mini (US)':
-		case 'Plug Mini (JP)':
-		case 'Plug':
-		case 'Bot':
+		case 'Hub':
+		case 'Hub Plus':
+		case 'Hub Mini':
+		case 'Meter':
+		case 'Meter Plus (JP)':
+		case 'Meter Plus (US)':
+		case 'Motion Sensor':
+		case 'Contact Sensor':
+		case 'Keypad':
+		case 'Keypad Touch':
+			return dummy;
+
+		default:
 			return (
 				<>
 					<Button
@@ -216,8 +226,5 @@ const DeviceControl = ({ device }: { device: SwitchBotDevice }) => {
 					</Button>
 				</>
 			);
-
-		default:
-			return dummy;
 	}
 };
