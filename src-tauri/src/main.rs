@@ -11,7 +11,9 @@ use reqwest::RequestBuilder;
 use ring::hmac;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Result as SerdeResult, Value};
-use tauri::{Manager, SystemTray, SystemTrayEvent};
+use tauri::{
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+};
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 
@@ -21,13 +23,10 @@ use tauri::ActivationPolicy;
 // メインプロセス
 
 fn main() {
-    // System Tray
-    let tray = SystemTray::new();
     // Build
     tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_store::Builder::default().build())
-        .system_tray(tray)
         // 各種設定
         .setup(|app| {
             let window = app.get_window("main").unwrap();
@@ -39,7 +38,11 @@ fn main() {
             }
             Ok(())
         })
-        // システムトレイの各イベントハンドラ
+        // システムトレイ
+        .system_tray(SystemTray::new().with_menu(
+            SystemTrayMenu::new().add_item(CustomMenuItem::new("quit".to_string(), "Quit")),
+        ))
+        // システムトレイイベント処理
         .on_system_tray_event(|app, event| {
             tauri_plugin_positioner::on_tray_event(app, &event);
             match event {
@@ -58,15 +61,24 @@ fn main() {
                         window.set_focus().unwrap();
                     }
                 }
+                SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                    "quit" => {
+                        std::process::exit(0);
+                    }
+                    _ => {}
+                },
                 _ => {}
             }
         })
+        // API登録
         .invoke_handler(tauri::generate_handler![
             get_devices,
             send_command,
             get_status
         ])
+        // 実行
         .run(tauri::generate_context!())
+        // エラー処理
         .expect("error while running tauri application");
 }
 
