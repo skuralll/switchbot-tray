@@ -7,6 +7,8 @@ import {
 	css,
 	Fab,
 	Grid,
+	Hidden,
+	LinearProgress,
 	Paper,
 	Typography,
 } from '@mui/material';
@@ -22,6 +24,7 @@ import {
 } from '../libs/switchbot/switchbot';
 import { Command } from '../model';
 import { SwitchBotDevice } from '../libs/switchbot/devices';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // デバイスリスト
 export const DeviceList = ({ height }: { height: string }) => {
@@ -80,6 +83,8 @@ export const DeviceList = ({ height }: { height: string }) => {
 export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 	const { showSnackbar } = useSnackbar();
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
+	// 何かしらの処理中かどうかを管理するState
+	const [processing, setProcessing] = useState(false);
 
 	// デバイス管理用State
 	const [device, setDevice] = useState(device_raw);
@@ -119,8 +124,13 @@ export const Device = ({ device_raw }: { device_raw: SwitchBotDevice }) => {
 					<DeviceInfo device={device} />
 				</CardContent>
 				<CardActions sx={{ justifyContent: 'center' }}>
-					<DeviceControl device={device} updateDeviceInfo={updateDeviceInfo} />
+					<DeviceControl
+						device={device}
+						updateDeviceInfo={updateDeviceInfo}
+						setProcessing={setProcessing}
+					/>
 				</CardActions>
+				<ProgressBar isEnable={processing} />
 			</Card>
 		</Grid>
 	);
@@ -162,24 +172,28 @@ const DeviceInfo = ({ device }: { device: SwitchBotDevice }) => {
 const DeviceControl = ({
 	device,
 	updateDeviceInfo,
+	setProcessing,
 }: {
 	device: SwitchBotDevice;
 	updateDeviceInfo: () => Promise<void>;
+	setProcessing: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
 	const { showSnackbar } = useSnackbar();
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
 
 	// 操作コマンドを送信し、結果をSnackBarに表示する
 	const controlDevice = async (command: Command) => {
+		setProcessing(true);
 		try {
 			const res = await sendCommand(tokens.tokens, command);
 			showSnackbar(`${res}`, 'success');
 			// デバイス情報を更新する
-			await new Promise((s) => setTimeout(s, 2000)); // 反映に時間がかかるため1秒待つ
+			await new Promise((s) => setTimeout(s, 3000)); // 反映に時間がかかるため3秒待つ
 			await updateDeviceInfo();
 		} catch (err) {
 			showSnackbar(`${err}`, 'error');
 		}
+		setProcessing(false);
 	};
 
 	const dummy = (
@@ -240,4 +254,17 @@ const DeviceControl = ({
 				</>
 			);
 	}
+};
+
+// プログレスバー
+const ProgressBar = ({ isEnable }: { isEnable: boolean }) => {
+	return (
+		<>
+			{isEnable ? (
+				<LinearProgress color="success" sx={{ height: '4px' }} />
+			) : (
+				<Box sx={{ height: '4px' }} />
+			)}
+		</>
+	);
 };
