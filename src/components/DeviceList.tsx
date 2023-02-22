@@ -1,15 +1,15 @@
 import {
+	alpha,
+	Backdrop,
 	Box,
 	Button,
 	Card,
 	CardActions,
 	CardContent,
-	css,
+	CircularProgress,
 	Fab,
 	Grid,
-	Hidden,
 	LinearProgress,
-	Paper,
 	Typography,
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -24,15 +24,19 @@ import {
 } from '../libs/switchbot/switchbot';
 import { Command } from '../model';
 import { SwitchBotDevice } from '../libs/switchbot/devices';
-import CircularProgress from '@mui/material/CircularProgress';
 
 // デバイスリスト
 export const DeviceList = ({ height }: { height: string }) => {
 	const { state: tokens, dispatch: dispatch_tokens } = useTokens();
 	const { state: devices, dispatch: dispatch_devices } = useDevices();
+	// デバイスリストを取得中かどうかを管理するState
+	const [loading, setLoading] = useState(false);
 
 	// デバイスリストを更新する
 	const updateDeviceList = async () => {
+		if (loading) return;
+
+		setLoading(true);
 		dispatch_devices({
 			type: 'SET_DEVICES',
 			devices: [],
@@ -48,6 +52,7 @@ export const DeviceList = ({ height }: { height: string }) => {
 				devices: devices,
 			});
 		}
+		setLoading(false);
 	};
 
 	// トークンが変更された場合デバイスリストを更新する
@@ -75,6 +80,7 @@ export const DeviceList = ({ height }: { height: string }) => {
 					))}
 				</Grid>
 			</Box>
+			<LoadingOverlay isEnable={loading} />
 		</>
 	);
 };
@@ -266,5 +272,21 @@ const ProgressBar = ({ isEnable }: { isEnable: boolean }) => {
 				<Box sx={{ height: '4px' }} />
 			)}
 		</>
+	);
+};
+
+// ロード中に表示するオーバーレイ
+const LoadingOverlay = ({ isEnable }: { isEnable: boolean }) => {
+	return (
+		<Backdrop
+			sx={{
+				color: '#4caf50',
+				bgcolor: alpha('#fff', 0),
+				zIndex: (theme) => theme.zIndex.drawer + 1,
+			}}
+			open={isEnable}
+		>
+			<CircularProgress color="inherit" />
+		</Backdrop>
 	);
 };
