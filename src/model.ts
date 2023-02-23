@@ -10,3 +10,8 @@ export type Command = {
 	command: string;
 	parameter: string;
 };
+
+// settings model
+export type Settings = {
+	autostart: boolean;
+};

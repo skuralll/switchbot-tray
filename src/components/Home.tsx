@@ -5,18 +5,16 @@ import { TestComponent } from './TestComponent';
 import { DeviceList } from './DeviceList';
 import { DevicesProvider } from '../contexts/devicesContext';
 import { SnackbarContextProvider } from '../libs/snackbar/Snackbar';
+import { SettingsProvider } from '../contexts/settingsContext';
 
 export const Home = () => {
 	return (
 		<>
 			<SnackbarContextProvider>
-				<TokensProvider>
-					<DevicesProvider>
-						<Header height="36px" />
-						{/* <TestComponent /> */}
-						<DeviceList height="604px" />
-					</DevicesProvider>
-				</TokensProvider>
+				<DevicesProvider>
+					<Header height="36px" />
+					<DeviceList height="604px" />
+				</DevicesProvider>
 			</SnackbarContextProvider>
 		</>
 	);

@@ -1,11 +1,13 @@
+import { enable, disable } from 'tauri-plugin-autostart-api';
 import { Store } from 'tauri-plugin-store-api';
-import { Tokens } from '../model';
+import { Settings, Tokens } from '../model';
 
 const store = new Store('.settings.dat');
 store.load();
 
 export const STORAGE_KEY = {
 	TOKENS: 'tokens',
+	SETTINGS: 'settings',
 };
 
 // トークンを保存する
@@ -21,6 +23,24 @@ export const getSavedTokens = async (): Promise<Tokens> => {
 			secret: '',
 		}
 	);
+};
+
+// 設定ファイルを保存する
+export const setSavedSettings = async (settings: Settings): Promise<void> => {
+	await store.set(STORAGE_KEY.SETTINGS, settings);
+};
+
+// 設定ファイルを取得する
+export const getSavedSettings = async (): Promise<Settings> => {
+	const settings = await store.get<Settings>(STORAGE_KEY.SETTINGS);
+	if (settings == null) {
+		await enable();
+		return {
+			autostart: true,
+		};
+	} else {
+		return settings;
+	}
 };
 
 export const save = async () => {

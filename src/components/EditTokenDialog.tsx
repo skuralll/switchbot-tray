@@ -21,7 +21,7 @@ export const EditTokenDialog = (props: {
 	open: boolean;
 	onClose: () => void;
 }) => {
-	// アプリケーション全体でのトークン用State
+	// アプリケーション全体でのトークン用Context
 	const { state: tokens, dispatch: dispatch } = useTokens();
 	// このコンポーネント内でのトークン用State
 	const [e_tokens, setEditTokens] = useState<Tokens>(tokens.tokens);
