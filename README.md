@@ -6,7 +6,7 @@ This app resides in the system tray and allows you to control your SwitchBot dev
 ## Usage
 
 [Please get installer from here.](https://github.com/skuralll/switchbot-tray/releases)  
-after installaion and the launch, you can see the icon in the system tray. And after you click the icon, you can see the window.  
+After installaion and the launch, you can see the icon in the system tray. And after you click the icon, you can see the window.  
 Also, you click upper right icon, you can see the menu.Please select "Edit Token" from the menu and fill in textfield your token.
 
 ## License
