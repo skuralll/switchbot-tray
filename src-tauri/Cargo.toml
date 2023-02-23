@@ -19,6 +19,7 @@ tauri = { version = "1.2", features = ["macos-private-api", "shell-open", "syste
 window-shadows = "0.2.1"
 tauri-plugin-positioner = { version = "1.0.4", features = ["system-tray"] }
 tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
+tauri-plugin-autostart = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
 rand = "0.8.5"
 reqwest = "0.11.14"
 chrono = "0.4.23"

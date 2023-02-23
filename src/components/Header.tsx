@@ -15,7 +15,9 @@ import { styled } from '@mui/system';
 import MenuIcon from '@mui/icons-material/Menu';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { EditTokenDialog } from './EditTokenDialog';
+import { SettingDialog } from './SettingDialog';
 
 // AppBar
 const MainAppBar = styled(AppBar)(({ theme }) => ({
@@ -61,8 +63,10 @@ const MainMenu = () => {
 		setAnchorEl(null);
 	};
 	/*各アイテム用 */
-	// EditTokenDialog
+	// トークン編集用ダイアログ
 	const [et_open, setETOpen] = React.useState(false);
+	// 設定用ダイアログ
+	const [st_open, setSTOpen] = React.useState(false);
 
 	return (
 		<>
@@ -75,6 +79,7 @@ const MainMenu = () => {
 					setETOpen(false);
 				}}
 			/>
+			<SettingDialog open={st_open} setDialogOpen={setSTOpen} />
 			<Menu
 				id="main-menu"
 				anchorEl={anchorEl}
@@ -94,6 +99,17 @@ const MainMenu = () => {
 						<EditIcon fontSize="small" />
 					</ListItemIcon>
 					Edit Token
+				</MenuItem>
+				<MenuItem
+					onClick={() => {
+						handleClose();
+						setSTOpen(true);
+					}}
+				>
+					<ListItemIcon>
+						<SettingsIcon fontSize="small" />
+					</ListItemIcon>
+					Settings
 				</MenuItem>
 			</Menu>
 		</>

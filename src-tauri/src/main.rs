@@ -14,6 +14,7 @@ use serde_json::{json, Result as SerdeResult, Value};
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
 };
+use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_positioner::{Position, WindowExt};
 use window_shadows::set_shadow;
 
@@ -27,6 +28,10 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec![]),
+        ))
         // 各種設定
         .setup(|app| {
             let window = app.get_window("main").unwrap();

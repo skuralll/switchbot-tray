@@ -19,6 +19,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
     "sh": "^0.0.3",
+    "tauri-plugin-autostart-api": "https://github.com/tauri-apps/tauri-plugin-autostart",
     "tauri-plugin-store-api": "https://github.com/tauri-apps/tauri-plugin-store"
   },
   "devDependencies": {
